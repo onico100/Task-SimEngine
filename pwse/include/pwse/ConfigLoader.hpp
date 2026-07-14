@@ -13,6 +13,7 @@ struct TaskSpec {
     int duration;
     int priority;
     TaskType type;
+    int deadline = -1; // -1 means "no deadline configured"
 };
 
 struct SimulationConfig {

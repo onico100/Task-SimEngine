@@ -41,6 +41,7 @@ SimulationConfig ConfigLoader::loadFromString(const std::string& jsonText) {
         spec.duration = t.at("duration").asInt();
         spec.priority = t.at("priority").asInt();
         spec.type = taskTypeFromString(t.at("type").asString());
+        spec.deadline = t.at("deadline").asInt();
         config.tasks.push_back(std::move(spec));
     }
 

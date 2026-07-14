@@ -12,7 +12,8 @@ SimulationEngine::SimulationEngine(const SimulationConfig& config)
     int id = 0;
     for (const auto& spec : config.tasks) {
         // ids are assigned sequentially (0..N-1), so id == index into tasks_.
-        tasks_.emplace_back(id++, spec.name, spec.duration, spec.priority, spec.type);
+        tasks_.emplace_back(id++, spec.name, spec.duration, spec.priority, spec.type,
+                             spec.deadline);
     }
 }
 
@@ -39,6 +40,29 @@ SimulationSummary SimulationEngine::run() {
         ? static_cast<double>(completionDaySum) / completed
         : 0.0;
     summary.overloadDays = overloadDayCount_;
+
+    for (const auto& task : tasks_) {
+        DeadlineStatus ds = task.deadlineStatus();
+        switch (ds) {
+            case DeadlineStatus::OnTime:
+                ++summary.onTimeTasks;
+                ++summary.tasksWithDeadlines;
+                break;
+            case DeadlineStatus::Late:
+                ++summary.lateTasks;
+                ++summary.tasksWithDeadlines;
+                break;
+            case DeadlineStatus::Missed:
+                ++summary.missedTasks;
+                ++summary.tasksWithDeadlines;
+                break;
+            case DeadlineStatus::NoDeadline:
+                break;
+        }
+    }
+    summary.onTimeRate = summary.tasksWithDeadlines > 0
+        ? static_cast<double>(summary.onTimeTasks) / summary.tasksWithDeadlines
+        : 0.0;
 
     printSummary(summary);
     return summary;
@@ -95,6 +119,39 @@ void SimulationEngine::printSummary(const SimulationSummary& summary) const {
     if (summary.completedTasks > 0) {
         std::cout << std::fixed << std::setprecision(2);
         std::cout << "Avg completion day: " << summary.avgCompletionDay << "\n";
+    }
+
+    if (summary.tasksWithDeadlines > 0) {
+        std::cout << std::fixed << std::setprecision(1);
+        std::cout << "\n=== Deadlines ===\n";
+        std::cout << "Tasks with deadlines: " << summary.tasksWithDeadlines << "\n";
+        std::cout << "On-time rate:         " << (summary.onTimeRate * 100.0) << "%\n";
+        std::cout << "On time:              " << summary.onTimeTasks << "\n";
+        std::cout << "Late:                 " << summary.lateTasks << "\n";
+        std::cout << "Missed:               " << summary.missedTasks << "\n";
+
+        if (summary.lateTasks > 0) {
+            std::cout << "\nLate tasks:\n";
+            for (const auto& task : tasks_) {
+                if (task.deadlineStatus() == DeadlineStatus::Late) {
+                    std::cout << "  - '" << task.name() << "' completed day "
+                               << task.completedOnDay() << " (deadline day "
+                               << task.deadline() << ")\n";
+                }
+            }
+        }
+
+        if (summary.missedTasks > 0) {
+            std::cout << "\nMissed tasks:\n";
+            for (const auto& task : tasks_) {
+                if (task.deadlineStatus() == DeadlineStatus::Missed) {
+                    std::cout << "  - '" << task.name() << "' deadline was day "
+                               << task.deadline() << ", "
+                               << (task.totalDuration() - task.remaining())
+                               << "/" << task.totalDuration() << " done\n";
+                }
+            }
+        }
     }
 
     if (summary.incompleteTasks > 0) {
