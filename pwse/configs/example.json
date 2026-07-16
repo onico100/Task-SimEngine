@@ -1,16 +1,48 @@
 {
-  "simulation": {
-    "days": 10
-  },
-  "agent": {
-    "daily_capacity": 8
-  },
+  "simulation": { "days": 10 },
+  "agent": { "daily_capacity": 8 },
   "tasks": [
-    { "name": "Write Thesis Chapter", "duration": 20, "priority": 9, "type": "study" },
-    { "name": "Finish Client Report", "duration": 12, "priority": 8, "type": "work" },
-    { "name": "Prep Exam Notes",      "duration": 8,  "priority": 7, "type": "study" },
-    { "name": "Team Standup Prep",    "duration": 3,  "priority": 5, "type": "work" },
-    { "name": "Grocery Shopping",     "duration": 2,  "priority": 3, "type": "life" },
-    { "name": "Doctor Appointment",   "duration": 1,  "priority": 6, "type": "life" }
+    {
+      "name": "Write Thesis Chapter",
+      "duration": 20,
+      "priority": 9,
+      "type": "study",
+      "deadline": 8
+    },
+    {
+      "name": "Finish Client Report",
+      "duration": 12,
+      "priority": 8,
+      "type": "work",
+      "deadline": 5
+    },
+    {
+      "name": "Prep Exam Notes",
+      "duration": 8,
+      "priority": 7,
+      "type": "study",
+      "deadline": 6
+    },
+    {
+      "name": "Team Standup Prep",
+      "duration": 3,
+      "priority": 5,
+      "type": "work",
+      "deadline": 2
+    },
+    {
+      "name": "Grocery Shopping",
+      "duration": 2,
+      "priority": 3,
+      "type": "life",
+      "deadline": 9
+    },
+    {
+      "name": "Doctor Appointment",
+      "duration": 1,
+      "priority": 6,
+      "type": "life",
+      "deadline": 10
+    }
   ]
 }
