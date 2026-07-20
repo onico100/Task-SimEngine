@@ -17,12 +17,16 @@ struct SimulationSummary {
     int overloadDays = 0;      // days where at least one task was starved of capacity
     double avgCompletionDay = 0.0; // average day-of-completion across completed tasks
 
-    // Deadline tracking (only meaningful for tasks that defined a deadline).
-    int tasksWithDeadlines = 0;
-    int onTimeTasks = 0;
-    int lateTasks = 0;
-    int missedTasks = 0;
-    double onTimeRate = 0.0; // onTimeTasks / tasksWithDeadlines, 0 if none had deadlines
+    // Dependency/deadline-aware stats.
+    int lateTasks = 0;              // completed, but after their deadline
+    int missedTasks = 0;            // had a deadline that elapsed before completion
+    int blockedTasksAtEnd = 0;      // still have unmet dependencies when the run ends
+    int neverAvailableTasks = 0;    // never had their dependencies satisfied during the run
+                                     // (equal to blockedTasksAtEnd: dependency satisfaction
+                                     // is monotonic, so "blocked at the end" and "never
+                                     // became available" describe the same set of tasks --
+                                     // reported as separate fields to match requested output)
+    int dependencyConstraintsResolved = 0; // dependency edges whose prerequisite completed
 };
 
 // Owns the world state (agent + tasks) and drives the tick loop.
