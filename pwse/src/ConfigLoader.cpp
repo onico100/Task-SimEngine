@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include "pwse/DependencyValidator.hpp"
 #include "pwse/Json.hpp"
 
 namespace pwse {
@@ -37,17 +38,33 @@ SimulationConfig ConfigLoader::loadFromString(const std::string& jsonText) {
     const json::Value& tasks = root.at("tasks");
     for (const json::Value& t : tasks.asArray()) {
         TaskSpec spec;
+        spec.id = t.at("id").asString();
         spec.name = t.at("name").asString();
         spec.duration = t.at("duration").asInt();
         spec.priority = t.at("priority").asInt();
         spec.type = taskTypeFromString(t.at("type").asString());
-        spec.deadline = t.at("deadline").asInt();
+
+        if (const json::Value* deadline = t.find("deadline")) {
+            spec.deadline = deadline->asInt();
+        }
+
+        if (const json::Value* deps = t.find("dependencies")) {
+            for (const json::Value& dep : deps->asArray()) {
+                spec.dependencies.push_back(dep.asString());
+            }
+        }
+
         config.tasks.push_back(std::move(spec));
     }
 
     if (config.tasks.empty()) {
         throw std::runtime_error("Config must define at least one task");
     }
+
+    // Uniqueness, referential integrity, and acyclicity must all hold
+    // before we hand this config to the engine -- resolving dependency
+    // ids to internal indices later assumes all of this already passed.
+    validateDependencies(config.tasks);
 
     return config;
 }

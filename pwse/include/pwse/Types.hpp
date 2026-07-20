@@ -35,24 +35,6 @@ enum class TaskStatus {
     Completed    // duration fully consumed
 };
 
-// Deadline outcome for a task, evaluated once the simulation ends.
-enum class DeadlineStatus {
-    NoDeadline,  // task didn't define a deadline
-    OnTime,      // completed on or before its deadline
-    Late,        // completed, but after its deadline
-    Missed       // simulation ended before the task was completed
-};
-
-inline std::string toString(DeadlineStatus status) {
-    switch (status) {
-        case DeadlineStatus::NoDeadline: return "no_deadline";
-        case DeadlineStatus::OnTime:     return "on_time";
-        case DeadlineStatus::Late:       return "late";
-        case DeadlineStatus::Missed:     return "missed";
-    }
-    return "unknown";
-}
-
 inline std::string toString(TaskStatus status) {
     switch (status) {
         case TaskStatus::Pending:    return "pending";
@@ -61,7 +43,5 @@ inline std::string toString(TaskStatus status) {
     }
     return "unknown";
 }
-
-
 
 } // namespace pwse
