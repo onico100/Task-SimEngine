@@ -20,6 +20,7 @@ add_library(pwse_core
     src/Scheduler.cpp
     src/SimulationEngine.cpp
     src/ConfigLoader.cpp
+    src/DependencyValidator.cpp
     src/Json.cpp
 )
 target_include_directories(pwse_core PUBLIC include)

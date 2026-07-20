@@ -13,16 +13,18 @@ struct Assignment {
     int allocated;
 };
 
-// Result of one scheduling pass, including tasks that wanted work but
-// got none because capacity ran out (useful for bottleneck analysis).
+// Result of one scheduling pass.
 struct ScheduleResult {
     std::vector<Assignment> assignments;
-    std::vector<int> starvedTaskIds; // pending/in-progress tasks that received 0
+    std::vector<int> starvedTaskIds; // eligible tasks that got 0 capacity today
+    std::vector<int> blockedTaskIds; // tasks skipped entirely: unmet dependencies
 };
 
 // Simple greedy priority scheduler:
-//   1. Consider all not-yet-completed tasks.
-//   2. Sort by priority descending (ties broken by task id for determinism).
+//   1. Consider all not-yet-completed tasks whose dependencies are all
+//      satisfied (blocked tasks are set aside and never receive capacity).
+//   2. Sort the eligible tasks by priority descending (ties broken by
+//      task id for determinism).
 //   3. Assign as much of the agent's remaining capacity as each task can
 //      absorb, highest priority first, until capacity is exhausted.
 class Scheduler {
